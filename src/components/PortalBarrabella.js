@@ -1,77 +1,77 @@
 import { useState } from "react";
 
 export default function PortalBarrabella() {
-  const [despesas, setDespesas] = useState([
-    {
-      tipo: "Taxa de limpeza",
-      valor: "120",
-      data: "2025-06-15",
-      observacao: "Referente à saída do hóspede João",
-      comprovante: "comprovante1.pdf",
-    },
-    {
-      tipo: "Luz",
-      valor: "98.70",
-      data: "2025-06-12",
-      observacao: "Conta Enel – junho",
-      comprovante: "comprovante2.pdf",
-    },
+  const [dados, setDados] = useState([
+    { ap: "101", valor: 8750, tipo: "Mensal", limpeza: 150, luz: 100, gas: 130, internet: 80 },
+    { ap: "102", valor: 15000, tipo: "Temporada", limpeza: 150, luz: 120, gas: 130, internet: 80 },
+    { ap: "107", valor: 15000, tipo: "Mensal", limpeza: 150, luz: 100, gas: 130, internet: 80 },
+    { ap: "118", valor: 15500, tipo: "Mensal", limpeza: 150, luz: 120, gas: 130, internet: 80 },
+    { ap: "109", valor: 10500, tipo: "Temporada", limpeza: 150, luz: 100, gas: 130, internet: 80 },
   ]);
 
-  const [form, setForm] = useState({ tipo: "", valor: "", data: "", observacao: "", comprovante: null });
-
-  const handleInputChange = (e) => {
-    const { name, value, files } = e.target;
-    setForm({
-      ...form,
-      [name]: files ? files[0] : value,
-    });
-  };
-
-  const adicionarDespesa = () => {
-    if (!form.tipo || !form.valor || !form.data) return;
-    const novaDespesa = { ...form, comprovante: form.comprovante?.name || "" };
-    setDespesas([...despesas, novaDespesa]);
-    setForm({ tipo: "", valor: "", data: "", observacao: "", comprovante: null });
-  };
+  const receita = dados.reduce((acc, curr) => acc + curr.valor, 0);
+  const despesas = dados.reduce((acc, curr) => acc + curr.limpeza + curr.luz + curr.gas + curr.internet, 0);
+  const saldo = receita - despesas;
 
   return (
-    <div style={{ maxWidth: '800px', margin: 'auto', padding: '20px' }}>
-      <h1>Despesas Detalhadas</h1>
-      <p>Apartamento 1203 – Junho de 2025</p>
+    <div className="min-h-screen bg-white text-gray-800">
+      <header className="bg-blue-900 text-white py-4 px-6 flex justify-between items-center">
+        <h1 className="text-xl font-bold tracking-wide">PORTAL BARRABELLA</h1>
+        <button className="text-sm underline">Logout</button>
+      </header>
 
-      <table style={{ width: '100%', marginBottom: '20px', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th>Tipo de Despesa</th>
-            <th>Valor (R$)</th>
-            <th>Data</th>
-            <th>Observação</th>
-            <th>Comprovante</th>
-          </tr>
-        </thead>
-        <tbody>
-          {despesas.map((item, index) => (
-            <tr key={index}>
-              <td>{item.tipo}</td>
-              <td>R$ {item.valor}</td>
-              <td>{item.data}</td>
-              <td>{item.observacao}</td>
-              <td><a href="#" style={{ color: 'blue' }}>Ver</a></td>
+      <main className="p-6 max-w-5xl mx-auto">
+        <h2 className="text-2xl font-semibold mb-6">Dashboard</h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="bg-gray-100 p-4 rounded-xl shadow text-center">
+            <p className="text-sm text-gray-500">Receita</p>
+            <p className="text-xl font-bold">R$ {receita.toLocaleString()}</p>
+          </div>
+          <div className="bg-gray-100 p-4 rounded-xl shadow text-center">
+            <p className="text-sm text-gray-500">Despesas</p>
+            <p className="text-xl font-bold">R$ {despesas.toLocaleString()}</p>
+          </div>
+          <div className="bg-gray-100 p-4 rounded-xl shadow text-center">
+            <p className="text-sm text-gray-500">Saldo</p>
+            <p className="text-xl font-bold">R$ {saldo.toLocaleString()}</p>
+          </div>
+        </div>
+
+        <table className="w-full table-auto border-collapse mb-6">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border p-2">Apartamento</th>
+              <th className="border p-2">Valor Pago</th>
+              <th className="border p-2">Tipo</th>
+              <th className="border p-2">Limpeza</th>
+              <th className="border p-2">Luz</th>
+              <th className="border p-2">Gás</th>
+              <th className="border p-2">Internet</th>
+              <th className="border p-2">Resultado</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {dados.map((item, index) => {
+              const resultado = item.valor - (item.limpeza + item.luz + item.gas + item.internet);
+              return (
+                <tr key={index} className="text-center">
+                  <td className="border p-2">{item.ap}</td>
+                  <td className="border p-2">R$ {item.valor.toLocaleString()}</td>
+                  <td className="border p-2">{item.tipo}</td>
+                  <td className="border p-2">R$ {item.limpeza}</td>
+                  <td className="border p-2">{item.luz}</td>
+                  <td className="border p-2">{item.gas}</td>
+                  <td className="border p-2">R$ {item.internet}</td>
+                  <td className="border p-2">R$ {resultado.toLocaleString()}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
 
-      <h2>Cadastrar Nova Despesa</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-        <input name="tipo" value={form.tipo} onChange={handleInputChange} placeholder="Tipo de Despesa" />
-        <input name="valor" value={form.valor} onChange={handleInputChange} type="number" placeholder="Valor" />
-        <input name="data" value={form.data} onChange={handleInputChange} type="date" />
-        <input name="observacao" value={form.observacao} onChange={handleInputChange} placeholder="Observação" />
-        <input name="comprovante" type="file" onChange={handleInputChange} />
-      </div>
-      <button onClick={adicionarDespesa} style={{ marginTop: '10px' }}>Adicionar</button>
+        <button className="bg-blue-900 text-white px-4 py-2 rounded-lg">Cadastrar Nova Despesa</button>
+      </main>
     </div>
   );
 }
